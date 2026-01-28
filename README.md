@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI-Assisted Issue Resolution: 
 
-## Getting Started
+## Description
+An internal engineering tool that helps development teams retain issue context, identify recurring problems, and resolve bugs faster by maintaining a structured history of issues, root causes, and resolutions across a shared codebase.
 
-First, run the development server:
+## Problem Statement
+This project exists because issues in a shared codebase often recur without a structured record of their root causes and resolutions. As a result, developers repeatedly debug the same or similar problems, losing time and context. The lack of a shared history of issues and fixes slows development, increases risk, and makes onboarding new engineers significantly harder.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Target User
+Software engineers working on shared production codebases within small-to-mid sized teams. These users care about resolving issues quickly and safely, maintaining system reliability, and preserving engineering knowledge that would otherwise be lost across pull requests, messages, and individual memory.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Non-Goals
+- AI output is advisory and does not make final engineering decisions
+- The system does not automatically apply fixes or modify code
+- This is not a replacement for issue tracking tools such as Jira or GitHub Issues
+- The tool does not attempt to redesign system architecture
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## System Boundaries Section
+UI -> Server -> DB
+       | 
+       AI
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Local Development
+- Run "docker compose up -d"
+- Start the app
+- No local Postgres installation required
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Architecture
+- Domain: business rules
+- Application: use cases
+- Lib: infrastructure
