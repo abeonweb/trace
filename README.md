@@ -18,9 +18,7 @@ Software engineers working on shared production codebases within small-to-mid si
 
 
 ## System Boundaries Section
-UI -> Server -> DB
-       | 
-       AI
+![System boundaries](<System Boundaries.png>)
 
 
 ## Local Development
