@@ -1,5 +1,6 @@
 export type Resolution = {
-    issueId: string;
-    rootCause: string;
-    prevention: string;
+    readonly issueId: string;
+    readonly rootCause: string;
+    readonly prevention: string;
+    readonly resolvedAt: Date;
 }

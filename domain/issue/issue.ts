@@ -1,8 +1,10 @@
 export type IssueStatus = "open" | "resolved";
 
 export type Issue = {
-    title: string;
+    readonly project: string;
+    readonly createdAt: Date;
+    readonly title: string;
     readonly id: string;
-    description: string;
-    status: IssueStatus;
+    readonly description: string;
+    readonly status: IssueStatus;
 }
