@@ -1,6 +1,9 @@
 import { Issue } from "@/domain/issue/issue";
-import { IssueRepository } from "../ports/issueRepository";
+import { IssueRepository } from "../ports/IssueRepository";
 
-export async function CreateIssue(issue: Issue, repo: IssueRepository): Promise<void>{
-    await repo.save(issue)
+export async function createIssue(
+  issue: Issue,
+  repo: IssueRepository,
+): Promise<void> {
+  await repo.save(issue);
 }
