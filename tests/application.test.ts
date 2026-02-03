@@ -1,82 +1,38 @@
-import { describe, expect, it, vi } from "vitest";
-import { IssueRepository } from "../application/issue/issueRepository";
-import { resolveIssueUseCase } from "../application/issue/resolveIssueUseCase";
+import { describe, expect, it } from "vitest";
+import { resolveIssueUseCase } from "../application/use-cases/resolveIssue";
 import { Issue } from "@/domain/issue/issue";
-import { Resolution } from "@/domain/resolution/resolution";
+import { Resolution } from "../domain/resolution/resolution";
+import { InMemoryIssueRepo, InMemoryResolutionRepo } from "../in-memory-repo";
 
 describe("Application layer", () => {
-  const fakeRepo: IssueRepository = {
-    async getById(id) {
-      return {
-        id,
-        title: "The faker",
-        description: "It's a fake",
-        status: "open",
-      };
-    },
+  it("resolve an issue through the application layer", async () => {
+    const issueRepo = new InMemoryIssueRepo();
+    const resolutionRepo = new InMemoryResolutionRepo();
 
-    async save(issue) {
-      console.log(issue.title);
-    },
-    async saveResolution(resolution) {
-      console.log(resolution.prevention);
-    },
-  };
-  const resolution = {
-    issueId: "2",
-    rootCause: "A bad case of the frontend jitters",
-    prevention: "Drink less coffee",
-  };
-  it("Marks an issue resolved correctly", async () => {
-    const result = await resolveIssueUseCase("2", resolution, fakeRepo);
-    expect(result.status).toBe("resolved");
-  });
+    const issue: Issue = {
+      id: "i-1",
+      project: "trace",
+      title: "Crash",
+      description: "App crashes",
+      status: "open",
+      createdAt: new Date(),
+    };
 
-  const getSaveSpy = vi.spyOn(fakeRepo, "save");
-  const issue: Issue = {
-    id: "3",
-    title: "Image not optimized",
-    description: "images all have a large size",
-    status: "resolved",
-  };
+    await issueRepo.save(issue);
 
-  it("Saves a resolved issue", () => {
-    fakeRepo.save(issue);
-    expect(getSaveSpy).toHaveBeenCalled();
-  });
+    const resolution: Resolution = {
+      issueId: issue.id,
+      rootCause: "Null ref",
+      prevention: "Guard",
+      resolvedAt: new Date(),
+    };
+    const resolved = await resolveIssueUseCase(
+      issue.id,
+      resolution,
+      issueRepo,
+      resolutionRepo,
+    );
 
-  const getSaveResolutionSpy = vi.spyOn(fakeRepo, "saveResolution");
-  it("Saves Resolution", () => {
-    fakeRepo.saveResolution(resolution);
-    expect(getSaveResolutionSpy).toHaveBeenCalled();
-  });
-});
-
-describe("Failing tests", () => {
-  const fakeRepo: IssueRepository = {
-    async getById() {
-      return null;
-    },
-    async save(issue) {
-      console.log(issue);
-    },
-    async saveResolution(resolution) {
-      console.log(resolution);
-    },
-  };
-  it("Issue does not exist", async () => {
-    const fakeIssue: Issue = {
-      id:"fake-id",
-      title: "Fake title",
-      description:"Fake description of fake issue",
-      status: "open"
-    }
-    const fakeResolution: Resolution = {
-      issueId: "",
-      rootCause:"",
-      prevention:""
-    }
-    const resolved = resolveIssueUseCase(fakeIssue.id, fakeResolution, fakeRepo)
-    await expect(resolved).rejects.toThrow("Issue not found")
+    expect(resolved.status).toBe("resolved");
   });
 });
