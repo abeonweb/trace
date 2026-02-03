@@ -1,12 +1,12 @@
 export class IssueAlreadyResolvedError extends Error {
   constructor(issueId: string) {
-    super(`Issue ${issueId} is already resolved`);
+    super(`Issue '${issueId}' is already resolved`);
   }
 }
 
 export class IssueNotFoundError extends Error {
   constructor(issueId: string) {
-    super(`Issue ${issueId} not found`);
+    super(`Issue '${issueId}' not found`);
   }
 }
 
