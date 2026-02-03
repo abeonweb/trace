@@ -26,3 +26,9 @@ CREATE UNIQUE INDEX "Resolution_issueId_key" ON "Resolution"("issueId");
 
 -- AddForeignKey
 ALTER TABLE "Resolution" ADD CONSTRAINT "Resolution_issueId_fkey" FOREIGN KEY ("issueId") REFERENCES "Issue"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+CREATE INDEX issues_search_idx
+ON issues
+USING GIN (
+  to_tsvector('english', title || ' ' || description)
+);

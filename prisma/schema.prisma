@@ -13,23 +13,37 @@ datasource db {
   provider = "postgresql"
 }
 
-model Issue {
-  id String @id
-  title String
-  description String
-  status IssueStatus
-  resolution Resolution?
-}
-
-model Resolution {
-  id String @id @default(uuid())
-  rootCause String
-  prevention String
-  issue Issue @relation(fields: [issueId], references: [id])
-  issueId String @unique
-}
-
 enum IssueStatus {
   open
   resolved
+}
+
+model Issue {
+  id          String      @id
+  title       String
+  description String
+  status      IssueStatus
+  createdAt   DateTime    @map("created_at")
+
+  resolution Resolution?
+  context    IssueContext[]
+  @@map("issues")
+}
+
+model Resolution {
+  issueId    String @id @map("issue_id")
+  rootCause  String @map("root_cause")
+  prevention String
+  resolvedAt DateTime @map("resolved_at")
+
+  issue      Issue  @relation(fields: [issueId], references: [id])
+}
+
+model IssueContext {
+  id      String @id
+  issueId String @map("issue_id")
+  type    String
+  value   String
+
+  issue Issue @relation(fields: [issueId], references: [id])
 }
