@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 type Sort = "relevance" | "recent";
 
-export function makeIssuesHandlers(deps: { issueRepo: IssueRepository }) {
+export function makeSearchIssuesHandlers(deps: { issueRepo: IssueRepository }) {
   return {
     async GET(req: Request): Promise<Response> {
       const { searchParams } = new URL(req.url);

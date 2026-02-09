@@ -4,6 +4,7 @@ import { resolveIssueUseCase } from "@/application/use-cases/resolveIssue";
 import {
   InvalidResolutionError,
   IssueAlreadyResolvedError,
+  IssueNotFoundError,
 } from "@/domain/errors";
 import { NextResponse } from "next/server";
 
@@ -47,7 +48,7 @@ export function makeResolveIssueHandler(deps: {
 
         return NextResponse.json({ issue: resolved }, { status: 200 });
       } catch (error: unknown) {
-        if (error instanceof InvalidResolutionError) {
+        if (error instanceof IssueNotFoundError) {
           return NextResponse.json({ message: error.message }, { status: 404 });
         }
 

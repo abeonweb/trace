@@ -1,5 +1,5 @@
 import { ResolutionRepository } from "../../application/ports/ResolutionRepository";
-import { Resolution } from "../../domain/resolution/resolution";
+import { Resolution } from "@/domain/resolution/resolution";
 
 export class FakeResolutionRepository implements ResolutionRepository {
     public saved: Resolution[] = [];

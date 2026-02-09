@@ -41,7 +41,6 @@ export class PrismaIssueRepository implements IssueRepository {
         where: { id: issue.id },
         data: { status: issue.status },
       });
-
     } catch (error: unknown) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2002") {
@@ -59,6 +58,28 @@ export class PrismaIssueRepository implements IssueRepository {
     const project = options?.project;
     const sort = options?.sort ?? "relevance";
 
+    const whereParts: Prisma.Sql[] = [
+      Prisma.sql`
+        to_tsvector('english', title || ' ' || description)
+        @@ plainto_tsquery('english', ${query})
+      `,
+    ];
+
+    if (project) {
+      whereParts.push(Prisma.sql`project = ${project}`);
+    }
+
+    let whereClause = whereParts[0];
+
+    for (let i = 1; i < whereParts.length; i++) {
+      whereClause = Prisma.sql`${whereClause} AND ${whereParts[i]}`;
+    }
+
+    const orderClause =
+      options?.sort === "recent"
+        ? Prisma.sql` ORDER BY created_at DESC`
+        : Prisma.sql``;
+
     const results = await this.prisma.$queryRaw<
       {
         id: string;
@@ -71,12 +92,8 @@ export class PrismaIssueRepository implements IssueRepository {
     >`
       SELECT *
       FROM issues
-      WHERE to_tsvector('english', title || ' ' || description)
-       @@ plainto_tsquery('english', ${query})
-       AND (${project} IS NULL OR project = ${project})
-       ${
-         sort === "recent" ? Prisma.sql`ORDER BY created_at DESC` : Prisma.sql``
-       }
+      WHERE ${whereClause}
+      ${orderClause}
     `;
 
     return results.map(mapIssueToDomain);
