@@ -76,7 +76,7 @@ export class PrismaIssueRepository implements IssueRepository {
     }
 
     const orderClause =
-      options?.sort === "recent"
+      sort === "recent"
         ? Prisma.sql` ORDER BY created_at DESC`
         : Prisma.sql``;
 
