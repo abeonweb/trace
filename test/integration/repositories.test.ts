@@ -4,6 +4,7 @@ import { closeDb, prisma, resetDb } from "./db";
 import { beforeEach } from "node:test";
 import { PrismaResolutionRepository } from "@/lib/db/prismaResolutionRepository";
 import { resolveIssueUseCase } from "@/application/use-cases/resolveIssue";
+import { Issue } from "@/domain/issue/issue";
 
 describe("PrismaIssueRepository", () => {
   const repo = new PrismaIssueRepository(prisma);
@@ -24,7 +25,7 @@ describe("PrismaIssueRepository", () => {
     await repo.save({
       id: "i-1",
       project: "trace",
-      title: "Timeout",
+      title: "Timed out",
       description: "DB timeout",
       status: "open",
       createdAt: new Date(),
@@ -81,7 +82,7 @@ describe("PrismaIssueRepository", () => {
     await repo.save({
       id: "i-3",
       project: "trace",
-      title: "Login timeout",
+      title: "Login error",
       description: "Timeout when hitting auth service",
       status: "open",
       createdAt: new Date(),
@@ -93,4 +94,41 @@ describe("PrismaIssueRepository", () => {
     });
     expect(results.some((i) => i.id === "i-3")).toBe(true);
   });
+
+  it("resolves search based on ranking relevance (title  over description", async () => {
+    const repo = new PrismaIssueRepository(prisma);
+    const issueA: Issue = {
+      id: "i-4",
+      project: "trace",
+      title: "Login",
+      description: "Timeout when hitting auth service",
+      status: "open",
+      createdAt: new Date(),
+    };
+
+    const issueB: Issue = {
+      id: "i-5",
+      project: "trace",
+      title: "Random timeout",
+      description: "seemingly random",
+      status: "open",
+      createdAt: new Date(),
+    };
+
+    await repo.save(issueA);
+    await repo.save(issueB);
+
+    const searchResults = await repo.search("timeout", { project: "trace" });
+    expect(searchResults).not.toBeNull();
+    expect(searchResults.length).toBeGreaterThan(1);
+    expect(searchResults[0]?.id).toBe("i-5");
+  });
+
+  it("search returns recent when query is empty", async ()=>{
+    const repo = new PrismaIssueRepository(prisma);
+    const searchResults = await repo.search("", {project:"trace"})
+    expect(searchResults).not.toBeNull()
+    expect(searchResults.length).toBeGreaterThan(1)
+
+  })
 });
