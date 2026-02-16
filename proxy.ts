@@ -4,7 +4,7 @@ function requestId() {
     return crypto.randomUUID();
 }
 
-export function middleware(req: Request) {
+export function proxy(req: Request) {
     const res = NextResponse.next();
     res.headers.set("x-request-id", req.headers.get("x-request-id") ?? requestId())
     return res;
