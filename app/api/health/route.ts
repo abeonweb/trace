@@ -1,4 +1,4 @@
-import { prisma } from "@/composition/container";
+import prisma from "@/composition/prisma";
 import { logError } from "@/lib/observability/logger";
 import { NextResponse } from "next/server";
 
