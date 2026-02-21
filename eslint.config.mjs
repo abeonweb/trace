@@ -22,6 +22,7 @@ const eslintConfig = defineConfig([
     settings: {
       "boundaries/elements": [
         { type: "app", pattern: "app/**" },
+        { type: "application", pattern: "application/**" },
         { type: "components", pattern: "components/**" },
         { type: "domain", pattern: "domain/**" },
         { type: "schemas", pattern: "schemas/**" },
@@ -36,7 +37,7 @@ const eslintConfig = defineConfig([
         {
           default: "disallow",
           rules: [
-            { from: "app", allow: ["domain", "schemas", "lib", "types"] },
+            { from: "app", allow: ["domain", "schemas", "lib", "types", "components"] },
             { from: "domain", allow: ["schemas", "types"] },
             { from: "lib", allow: ["domain","types", "application"] },
             { from: "application", allow: ["domain", "types"]},
