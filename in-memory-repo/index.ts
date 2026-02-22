@@ -19,12 +19,17 @@ export class InMemoryIssueRepo implements IssueRepository {
   }
 
   async search(query: string) {
+    console.log("in memory issue search query string", query);
     return Array.from(this.store.values());
   }
 }
 
 export class InMemoryResolutionRepo implements ResolutionRepository {
   public saved: Resolution[] = [];
+
+  async getByIssueId(issueId: string): Promise<Resolution | null> {
+    return this.saved.find((res) => issueId === res.issueId) ?? null;
+  }
 
   async save(resolution: Resolution) {
     this.saved.push(resolution);
