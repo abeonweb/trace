@@ -7,4 +7,5 @@ export type Issue = {
     readonly id: string;
     readonly description: string;
     readonly status: IssueStatus;
+    readonly organizationId: string;
 }

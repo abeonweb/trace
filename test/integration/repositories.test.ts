@@ -6,8 +6,10 @@ import { PrismaResolutionRepository } from "@/lib/db/prismaResolutionRepository"
 import { resolveIssueUseCase } from "@/application/use-cases/resolveIssue";
 import { Issue } from "@/domain/issue/issue";
 
+const TRACE_ORG_ID = process.env.TRACE_ORG_ID ?? "test-org";
+
 describe("PrismaIssueRepository", () => {
-  const repo = new PrismaIssueRepository(prisma);
+  const repo = new PrismaIssueRepository(prisma, TRACE_ORG_ID);
 
   beforeAll(async () => {
     await resetDb();
@@ -24,6 +26,7 @@ describe("PrismaIssueRepository", () => {
   it("saves and fetches by id", async () => {
     await repo.save({
       id: "i-1",
+      organizationId: TRACE_ORG_ID,
       project: "trace",
       title: "Timed out",
       description: "DB timeout",
@@ -38,11 +41,12 @@ describe("PrismaIssueRepository", () => {
   });
 
   it("resolves issue and persists resolution", async () => {
-    const issueRepo = new PrismaIssueRepository(prisma);
+    const issueRepo = new PrismaIssueRepository(prisma, TRACE_ORG_ID);
     const resolutionRepo = new PrismaResolutionRepository(prisma);
 
     await repo.save({
       id: "i-2",
+      organizationId: TRACE_ORG_ID,
       project: "trace",
       title: "Crasht",
       description: "App crashes on login",
@@ -77,10 +81,11 @@ describe("PrismaIssueRepository", () => {
   });
 
   it("searches issues by text (FTS)", async () => {
-    const repo = new PrismaIssueRepository(prisma);
+    const repo = new PrismaIssueRepository(prisma, TRACE_ORG_ID);
 
     await repo.save({
       id: "i-3",
+      organizationId: TRACE_ORG_ID,
       project: "trace",
       title: "Login error",
       description: "Timeout when hitting auth service",
@@ -96,10 +101,11 @@ describe("PrismaIssueRepository", () => {
   });
 
   it("resolves search based on ranking relevance (title  over description", async () => {
-    const repo = new PrismaIssueRepository(prisma);
+    const repo = new PrismaIssueRepository(prisma, TRACE_ORG_ID);
     const issueA: Issue = {
       id: "i-4",
       project: "trace",
+      organizationId: TRACE_ORG_ID,
       title: "Login",
       description: "Timeout when hitting auth service",
       status: "open",
@@ -108,6 +114,7 @@ describe("PrismaIssueRepository", () => {
 
     const issueB: Issue = {
       id: "i-5",
+      organizationId: TRACE_ORG_ID,
       project: "trace",
       title: "Random timeout",
       description: "seemingly random",
@@ -124,11 +131,40 @@ describe("PrismaIssueRepository", () => {
     expect(searchResults[0]?.id).toBe("i-5");
   });
 
-  it("search returns recent when query is empty", async ()=>{
-    const repo = new PrismaIssueRepository(prisma);
-    const searchResults = await repo.search("", {project:"trace"})
-    expect(searchResults).not.toBeNull()
-    expect(searchResults.length).toBeGreaterThan(1)
+  it("search returns recent when query is empty", async () => {
+    const repo = new PrismaIssueRepository(prisma, TRACE_ORG_ID);
+    const searchResults = await repo.search("", { project: "trace" });
+    expect(searchResults).not.toBeNull();
+    expect(searchResults.length).toBeGreaterThan(1);
+  });
+  
+  it("only returns queries of same organization id", async () => {
+    const repo = new PrismaIssueRepository(prisma, TRACE_ORG_ID);
+    const issueA: Issue = {
+      id: "i-6",
+      organizationId: TRACE_ORG_ID,
+      project: "trace",
+      title: "Temporary random glitch",
+      description: "Stops after a bit then continues",
+      status: "open",
+      createdAt: new Date(),
+    };
 
-  })
+    const issueB: Issue = {
+      id: "i-7",
+      organizationId: "orgB",
+      project: "brace",
+      title: "Random pause on load",
+      description: "seemingly random",
+      status: "open",
+      createdAt: new Date(),
+    };
+
+    await repo.save(issueA);
+    await repo.save(issueB);
+    const searchResults = await repo.search("random", { project: "trace" });
+    expect(searchResults).not.toBeNull();
+    expect(searchResults.some((v)=>(v.organizationId === "orgB"))).toBe(false);
+
+  });
 });

@@ -12,14 +12,20 @@ type SearchOptions = {
   offset?: number;
 };
 export class PrismaIssueRepository implements IssueRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(
+    private prisma: PrismaClient,
+    private orgId: string,
+  ) {}
 
   async getById(id: string) {
-    const issue = await this.prisma.issue.findUnique({ where: { id } });
+    const issue = await this.prisma.issue.findUnique({
+      where: { id, organizationId: this.orgId },
+    });
     if (!issue) return null;
 
     return {
       id: issue.id,
+      organizationId: issue.organizationId,
       project: issue.project,
       title: issue.title,
       description: issue.description,
@@ -32,6 +38,7 @@ export class PrismaIssueRepository implements IssueRepository {
     await this.prisma.issue.create({
       data: {
         id: issue.id,
+        organizationId: this.orgId,
         project: issue.project,
         title: issue.title,
         description: issue.description,
@@ -69,7 +76,7 @@ export class PrismaIssueRepository implements IssueRepository {
       options?.sort ?? (q.length > 0 ? "relevance" : "recent");
 
     const projectFilter = project
-      ? Prisma.sql` AND project = ${project}`
+      ? Prisma.sql` AND project = ${project} AND organization_id = ${this.orgId}`
       : Prisma.sql``;
 
     // Recent Mode (q is empty or recent mode explicitly requested)
@@ -100,6 +107,7 @@ export class PrismaIssueRepository implements IssueRepository {
       {
         id: string;
         project: string;
+        organizationId: string;
         title: string;
         description: string;
         status: string;
@@ -107,7 +115,7 @@ export class PrismaIssueRepository implements IssueRepository {
         rank: number;
       }[]
     >`
-        SELECT id, project, title, description, status, created_at,
+        SELECT id, organization_id, project, title, description, status, created_at,
         ts_rank_cd(
         (
           setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
@@ -125,8 +133,6 @@ export class PrismaIssueRepository implements IssueRepository {
         ORDER BY rank DESC, created_at DESC
         LIMIT ${limit} OFFSET ${offset}
       `;
-    ;
-
     return rows.map(mapIssueToDomain);
   }
 }

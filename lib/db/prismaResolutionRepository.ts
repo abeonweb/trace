@@ -28,4 +28,17 @@ export class PrismaResolutionRepository implements ResolutionRepository {
       throw error;
     }
   }
+
+  async getByIssueId(issueId: string) {
+    const resolution = await this.prisma.resolution.findUnique({
+      where: { issueId },
+    });
+    if (!resolution) return null;
+    return {
+      issueId: resolution.issueId,
+      rootCause: resolution.rootCause,
+      prevention: resolution.prevention,
+      resolvedAt: resolution.resolvedAt,
+    };
+  }
 }
