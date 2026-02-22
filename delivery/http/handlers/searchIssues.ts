@@ -1,6 +1,6 @@
 import { IssueRepository } from "@/application/ports/IssueRepository";
-import { log, logError } from "@/lib/observability/logger";
-import { getRequestId } from "@/lib/observability/request";
+import { log, logError } from "@/utils/observability/logger";
+import { getRequestId } from "@/utils/observability/request";
 import { NextResponse } from "next/server";
 
 type Sort = "relevance" | "recent";
@@ -53,7 +53,10 @@ export function makeSearchIssuesHandlers(deps: { issueRepo: IssueRepository }) {
           durationMs,
         });
 
-        return NextResponse.json({message: "Internal server error"}, {status:500})
+        return NextResponse.json(
+          { message: "Internal server error" },
+          { status: 500 },
+        );
       }
     },
   };

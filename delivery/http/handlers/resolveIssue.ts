@@ -6,8 +6,8 @@ import {
   IssueAlreadyResolvedError,
   IssueNotFoundError,
 } from "@/domain/errors";
-import { log, logError } from "@/lib/observability/logger";
-import { getRequestId } from "@/lib/observability/request";
+import { log, logError } from "@/utils/observability/logger";
+import { getRequestId } from "@/utils/observability/request";
 import { NextResponse } from "next/server";
 
 type ResolveBody = Partial<{ rootCause: string; prevention: string }>;
@@ -19,7 +19,7 @@ export function makeResolveIssueHandler(deps: {
   return {
     async POST(
       req: Request,
-      ctx: { params: { id: string } },
+      ctx: { params: Promise<{ id: string }> },
     ): Promise<Response> {
       const requestId = getRequestId(req);
       const started = performance.now();
@@ -66,7 +66,7 @@ export function makeResolveIssueHandler(deps: {
         );
       }
 
-      const issueId = ctx.params.id;
+      const issueId = (await ctx.params).id;
       try {
         // create resolution object
         const resolution = {

@@ -1,10 +1,11 @@
-import { getRequestId } from "@/lib/observability/request";
+import { getRequestId } from "@/utils/observability/request";
 import { IssueRepository } from "../../../application/ports/IssueRepository";
 import { createIssue } from "../../../application/use-cases/createIssue";
 import { Issue } from "../../../domain/issue/issue";
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
-import { log, logError } from "@/lib/observability/logger";
+import { log, logError } from "@/utils/observability/logger";
+import { getOrgId } from "@/lib/config";
 
 type CreateIssueBody = Partial<{
   project: string;
@@ -24,6 +25,7 @@ export function makeIssuesHandlers(deps: { issueRepo: IssueRepository }) {
       try {
         body = (await req.json()) as CreateIssueBody;
       } catch (error) {
+        console.log("create issue error", error);
         const durationMS = Math.round(performance.now() - started);
 
         log("warn", "createIssue.bad_json", {
@@ -59,6 +61,7 @@ export function makeIssuesHandlers(deps: { issueRepo: IssueRepository }) {
 
       const issue: Issue = {
         id: randomUUID(),
+        organizationId: getOrgId(),
         project,
         title,
         description,
@@ -79,7 +82,6 @@ export function makeIssuesHandlers(deps: { issueRepo: IssueRepository }) {
           },
         });
         return NextResponse.json({ id: issue.id }, { status: 201 });
-        
       } catch (error: unknown) {
         const durationMs = Math.round(performance.now() - started);
         logError("createIssue.failed", error, {
