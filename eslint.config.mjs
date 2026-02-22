@@ -41,7 +41,7 @@ const eslintConfig = defineConfig([
             { from: "app", allow: ["domain", "schemas", "lib", "types", "components", "utils"] },
             { from: "domain", allow: ["schemas", "types"] },
             { from: "lib", allow: ["domain","types", "application"] },
-            { from: "application", allow: ["domain", "types"]},
+            { from: "application", allow: ["domain", "types", "utils"]},
             { from: "components", allow: ["types", "utils"] },
           ],
         },
