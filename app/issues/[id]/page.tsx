@@ -1,7 +1,7 @@
 import ResolveForm from "@/components/issues/ResolveForm";
 import StatusBadge from "@/components/StatusBadge";
 import { Card } from "@/components/ui/card";
-import { formatDate } from "@/components/ui/utils";
+import { formatDate } from "@/utils/utils";
 import { getIssueDetail } from "@/lib/queries/issueDetail";
 import { notFound } from "next/navigation";
 
@@ -12,9 +12,8 @@ export default async function IssueDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-
   const id = (await params).id;
-  
+
   const detail = await getIssueDetail(id);
   if (!detail) notFound();
 
@@ -46,16 +45,20 @@ export default async function IssueDetailPage({
 
       {issue.status === "resolved" && resolution ? (
         <Card className="mt-4 rounded-xl p-4">
-            <div className="text-sm font-medium">Resolution</div>
-            <div className="mt-3 space-y-4 text-sm">
+          <div className="text-sm font-medium">Resolution</div>
+          <div className="mt-3 space-y-4 text-sm">
             <div>
               <div className="text-xs text-muted-foreground">Root cause</div>
-              <div className="mt-1 whitespace-pre-wrap">{resolution.rootCause}</div>
+              <div className="mt-1 whitespace-pre-wrap">
+                {resolution.rootCause}
+              </div>
             </div>
 
             <div>
               <div className="text-xs text-muted-foreground">Prevention</div>
-              <div className="mt-1 whitespace-pre-wrap">{resolution.prevention}</div>
+              <div className="mt-1 whitespace-pre-wrap">
+                {resolution.prevention}
+              </div>
             </div>
 
             <div className="text-xs text-muted-foreground">
@@ -67,7 +70,8 @@ export default async function IssueDetailPage({
         <Card className="mt-4 rounded-xl p-4">
           <div className="text-sm font-medium">Resolve</div>
           <div className="mt-2 text-sm text-muted-foreground">
-            Capture the root cause and the prevention so this doesn&apos;t cost the team time again.
+            Capture the root cause and the prevention so this doesn&apos;t cost
+            the team time again.
           </div>
 
           <div className="mt-4">

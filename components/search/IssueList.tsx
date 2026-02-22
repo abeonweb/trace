@@ -1,7 +1,7 @@
 import type { IssueDTO } from "@/types/issue";
 import Link from "next/link";
 import { Card } from "../ui/card";
-import { formatDate } from "../ui/utils";
+import { formatDate } from "@/utils/utils";
 import StatusBadge from "../StatusBadge";
 
 export function IssueList({ results }: { results: IssueDTO[] }) {
