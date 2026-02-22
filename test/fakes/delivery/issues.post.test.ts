@@ -1,6 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { makeIssuesHandlers } from "@/delivery/http/handlers/issues";
 import { FakeIssueRepository } from "@/test/fakes/FakeIssueRepository";
+
+beforeAll(() => {
+  process.env.TRACE_ORG_ID = "test-org";
+});
 
 describe("POST /api/issues", () => {
   it("returns 201 and id", async () => {
