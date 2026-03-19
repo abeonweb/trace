@@ -31,3 +31,9 @@ Software engineers working on shared production codebases within small-to-mid si
 - Domain: business rules
 - Application: use cases
 - Lib: infrastructure
+
+## Contributing
+Hi. If you would like to contribute you can do so by forking the repo and opening pull requests. Please ensure that your code passes the existing tests and linting, and write tests to test your changes if applicable.
+
+All pull requests should be submitted to the main branch.
+
